@@ -39,9 +39,11 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def movie_image_path(instance: "Movie", file_name: str) -> pathlib.Path:
-    file_name = f"{slugify(instance.title)}-{uuid.uuid4()}" + pathlib.Path(file_name).suffix
-    return pathlib.Path("upload/movies/") / pathlib.Path(file_name)
+def movie_image_path(instance: "Movie", filename: str) -> pathlib.Path:
+    filename = pathlib.Path(
+        f"{slugify(instance.title)}-{uuid.uuid4()}" + pathlib.Path(filename).suffix
+    )
+    return pathlib.Path("movies/") / filename
 
 
 class Movie(models.Model):
@@ -73,9 +75,7 @@ class MovieSession(models.Model):
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.created_at)
@@ -88,9 +88,7 @@ class Ticket(models.Model):
     movie_session = models.ForeignKey(
         MovieSession, on_delete=models.CASCADE, related_name="tickets"
     )
-    order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="tickets"
-    )
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tickets")
     row = models.IntegerField()
     seat = models.IntegerField()
 
@@ -132,9 +130,7 @@ class Ticket(models.Model):
         )
 
     def __str__(self):
-        return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
-        )
+        return f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
 
     class Meta:
         unique_together = ("movie_session", "row", "seat")
